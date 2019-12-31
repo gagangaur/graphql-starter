@@ -1,0 +1,49 @@
+const { GraphQLServer } = require("graphql-yoga");
+const todos = require("./Todos");
+const typeDefs = `
+  type Todo {
+      id:ID!    
+      title:String!
+      done:Boolean!
+  }
+  type Query{
+      allTodos:[Todo]!
+  }
+  type Mutation{
+      createTodo(title:String!,done:Boolean):Todo!
+      updateTodo(id:ID!,done:Boolean!):Todo!
+      deleteTodo(id:ID!):Todo!
+  }
+`;
+const resolvers = {
+  Query: {
+    allTodos: () => todos
+  },
+  Mutation: {
+    createTodo: (_, { title, done }) => {
+      const todo = {
+        id: todos.length,
+        title: title,
+        done: done
+      };
+      todos.push(todo);
+      return todo;
+    },
+    deleteTodo: (_, { id }) => {
+      const todoIndex = todos.findIndex(todo => todo.id == id);
+      const todo = todos[todoIndex];
+      todos.splice(todoIndex, 1);
+      return todo;
+    },
+    updateTodo: (_, { id, done }) => {
+      todos.map(todo => {
+        if (todo.id == id) {
+          todo.done = done;
+          return todo;
+        }
+      });
+    }
+  }
+};
+const server = new GraphQLServer({ typeDefs, resolvers });
+server.start(() => console.log("Server is running on localhost:4000"));
