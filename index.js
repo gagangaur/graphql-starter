@@ -36,12 +36,9 @@ const resolvers = {
       return todo;
     },
     updateTodo: (_, { id, done }) => {
-      todos.map(todo => {
-        if (todo.id == id) {
-          todo.done = done;
-          return todo;
-        }
-      });
+      const todo = todos.find(todo => todo.id == id);
+      todo.done = done;
+      return todo;
     }
   }
 };
